@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AegisCore Dashboard</title>
+<style>
+  body {
+    background-color: #121212;
+    color: #f0f0f0;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  header { padding: 20px; text-align: center; font-size: 1.5em; }
+  main { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; padding: 20px; }
+  .card {
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 10px;
+    min-width: 200px;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  }
+  .card h2 { margin: 0 0 10px 0; }
+</style>
+</head>
+<body>
+<header>AegisCore Dashboard</header>
+<main>
+  <div class="card">
+    <h2>Players</h2>
+    <p id="players">0 / 0</p>
+  </div>
+  <div class="card">
+    <h2>Ping Médio</h2>
+    <p id="ping">0ms</p>
+  </div>
+  <!-- src/dashboard/index.html -->
+<p id="queue">Fila: 0</p>
+<p id="players">0 / 600</p>
+<p id="ping">0ms</p>
+<script>
+async function update() {
+  const data = await fetch('/dashboard/status').then(r => r.json());
+  document.getElementById('players').innerText = `${data.players} / ${data.maxPlayers}`;
+  document.getElementById('queue').innerText = `Fila: ${data.queue}`;
+  const pingEl = document.getElementById('ping');
+  pingEl.innerText = `${data.ping}ms`;
+  pingEl.style.color = data.ping < 100 ? 'lime' : data.ping < 200 ? 'yellow' : 'red';
+}
+setInterval(update, 1000);
+update();
+</script>
+
+  <div class="card">
+    <h2>Status WS</h2>
+    <p id="status">Offline</p>
+  </div>
+</main>
+<script>
+async function update() {
+  try {
+    const res = await fetch('/dashboard/status');
+    const data = await res.json();
+    document.getElementById('players').innerText = `${data.players} / ${data.maxPlayers}`;
+    document.getElementById('ping').innerText = `${data.ping}ms`;
+    document.getElementById('status').innerText = data.online ? 'Online' : 'Offline';
+  } catch {
+    document.getElementById('status').innerText = 'Offline';
+  }
+}
+
+setInterval(update, 1000);
+update();
+</script>
+</body>
+</html>
